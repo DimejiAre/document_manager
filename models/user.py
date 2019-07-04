@@ -21,17 +21,22 @@ class user(object):
         Database.insert(collection='user', data=self.get_json())
 
     @staticmethod
-    def find_one_id(id):
-        pass
+    def find():
+        return [user for user in Database.find(collection="user")]
 
     @staticmethod
-    def find_one_username(name):
-        pass
+    def find_one_id(id):
+        return Database.find_one(collection="user", query={"_id": id})
 
-    def update_one(self):
-        pass
+    @staticmethod
+    def find_one_username(username):
+        return Database.find_one(collection="user", query={"username": username})
+
+    @staticmethod
+    def update_one(query, data):
+        Database.update_one(collection="user", query=query, data={'$inc': data})
 
     @staticmethod
     def delete(id):
-        pass
+        Database.delete(collection="user", query={"_id": id})
 

@@ -4,11 +4,13 @@ import uuid
 
 
 class Document(object):
-    def __init__(self, title, content, author, created_date=None, id=None):
+    def __init__(self, title, content, author, author_id, type="public", created_date=None, id=None):
         self.title = title
         self.content = content
         self.author = author
+        self.type = type
         self.created_date = datetime.utcnow() if created_date is None else created_date
+        self.author_id = author_id
         self._id = uuid.uuid4().hex if id is None else id
 
     def json_data(self):
@@ -16,7 +18,9 @@ class Document(object):
             "title": self.title,
             "content": self.content,
             "author": self.author,
+            "type": self.type,
             "created_date": self.created_date,
+            "author_id": self.author_id,
             "_id": self._id
         }
 
@@ -24,16 +28,21 @@ class Document(object):
         Database.insert(collection='document', data=self.json_data())
 
     @staticmethod
+    def find():
+        return [user for user in Database.find(collection="document")]
+
+    @staticmethod
     def find_one_id(id):
-        pass
+        return Database.find_one(collection="document", query={"_id": id})
 
     @staticmethod
     def find_one_title(title):
-        pass
+        return Database.find_one(collection="document", query={"title": title})
 
-    def update(self):
-        pass
+    @staticmethod
+    def update(query, data):
+        Database.update_one(collection="document", query=query, data={'$inc': data})
 
     @staticmethod
     def delete(id):
-        pass
+        Database.delete(collection="document", query={"_id": id})
