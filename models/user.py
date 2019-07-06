@@ -37,6 +37,11 @@ class User(object):
     def find_one_username(username):
         return Database.find_one(collection="user", query={"username": username})
 
+    @classmethod
+    def find_one_class_username(cls, username):
+        user_data = Database.find_one(collection="user", query={"username": username})
+        return cls(**user_data)
+
     def update_one(self, data):
         Database.update_one(collection="user", query={"_id": self._id}, data={'$set': data})
 

@@ -10,8 +10,9 @@ class Database(object):
         Database.db[collection].insert_one(data)
 
     @staticmethod
-    def find(collection):
-        return Database.db[collection].find()
+    def find(collection, query=None):
+        return Database.db[collection].find(query)
+
 
     @staticmethod
     def find_one(collection, query):

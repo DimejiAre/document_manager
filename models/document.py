@@ -40,9 +40,13 @@ class Document(object):
         doc_data = Database.find_one(collection="document", query={"_id": id})
         return cls(**doc_data)
 
+    # @staticmethod
+    # def find_one_title(title):
+    #     return Database.find_one(collection="document", query={"title": title})
+
     @staticmethod
-    def find_one_title(title):
-        return Database.find_one(collection="document", query={"title": title})
+    def find_by_author(author_id):
+        return [doc for doc in Database.find(collection="document", query={"author_id": author_id})]
 
     def update(self, data):
         Database.update_one(collection="document", query={"_id": self._id}, data={'$set': data})
