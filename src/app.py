@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    return "Hello World!"
+    return jsonify({"message": "Hello World!"})
 
 
 @app.route("/user", methods=["GET"])
@@ -44,11 +44,14 @@ def post_user():
     user.save_to_mongo()
     return jsonify({"message": "{} has been created".format(user.username)})
 
-# Update_user not yet working
+
 @app.route("/user/<id>", methods=['PUT'])
 def update_user(id):
     r = request.json
     user = User.find_one_class_id(id)
+    print(user.username)
+    print(type(r))
+    print(r)
     if user is not None:
         user.update_one(r)
         return jsonify({"message": "{} has been updated".format(user.username)})
@@ -68,11 +71,54 @@ def delete_user(id):
 
 @app.route("/document", methods=["GET"])
 def get_documents():
-    return jsonify([doc for doc in Document.find()])
+    docs = Document.find()
+    if docs is not None:
+        return jsonify({"documents": docs})
+    else:
+        return jsonify({"message": "No documents found"})
 
+
+@app.route("/document/<id>", methods=["GET"])
+def get_one_document_by_id(id):
+    doc = Document.find_one_id(id)
+    if doc is not None:
+        return jsonify(doc)
+    else:
+        return jsonify({"message": "Document does not exist"})
+
+
+# user_id to be gotten from logged in user
+@app.route("/document", methods=['POST'])
+def post_document():
+    user_id = "11111"
+    r = request.json
+    document = Document(title=r["title"], content=r["content"], author=r["author"], author_id=user_id)
+    document.save_to_mongo()
+    return jsonify({"message": "Document has been successfully created"})
+
+
+@app.route("/document/<id>", methods=['PUT'])
+def update_document(id):
+    r = request.json
+    document = Document.find_one_class_id(id)
+    if document is not None:
+        document.update(r)
+        return jsonify({"message": "Document has been updated"})
+    else:
+        return jsonify({"message": "Document does not exist"})
+
+
+@app.route("/document/<id>", methods=['DELETE'])
+def delete_document(id):
+    document = Document.find_one_class_id(id)
+    if document is not None:
+        document.delete()
+        return jsonify({"message": "Document has been deleted"})
+    else:
+        return jsonify({"message": "Document does not exist"})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=4000)
 
 
 

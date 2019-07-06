@@ -31,15 +31,14 @@ class User(object):
     @classmethod
     def find_one_class_id(cls,id):
         user_data = Database.find_one(collection="user", query={"_id": id})
-        user = cls(**user_data)
-        return user
+        return cls(**user_data)
 
     @staticmethod
     def find_one_username(username):
         return Database.find_one(collection="user", query={"username": username})
 
     def update_one(self, data):
-        Database.update_one(collection="user", query={"_id": self._id}, data={'$inc': data})
+        Database.update_one(collection="user", query={"_id": self._id}, data={'$set': data})
 
     def delete(self):
         Database.delete(collection="user", query={"_id": self._id})
