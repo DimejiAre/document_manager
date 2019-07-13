@@ -3,16 +3,22 @@ from document_manager.common.database import Database
 
 
 class User(object):
-    def __init__(self, username, password, admin=False, _id=None):
+    def __init__(self, name, username, password, email, phone, admin=False, _id=None):
+        self.name = name
         self.username = username
         self.password = password
+        self.email = email
+        self.phone = phone
         self.admin = admin  # user(r), admin(w,r)
         self._id = uuid.uuid4().hex if _id is None else _id
 
     def get_json(self):
         return {
+            "name": self.name,
             "username": self.username,
             "password": self.password,
+            "email": self.email,
+            "phone": self.phone,
             "admin": self.admin,
             "_id": self._id
         }
