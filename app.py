@@ -53,13 +53,17 @@ def login():
         if check_password_hash(user['password'], password):
             token = jwt.encode(user, app.config['SECRET_KEY'])
             session['token'] = token
-            print("user", user)
-            print("docs", docs)
             return render_template("profile.html", user=user['username'], docs=docs)
         else:
             return jsonify({"message": "login failed"})
 
     return render_template("login.html")
+
+
+@app.route("/logout", methods=['GET', 'POST'])
+def logout():
+    session['token'] = ""
+    return render_template("index.html")
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -70,9 +74,9 @@ def register():
         password = request.form["password"]
         email = request.form["email"]
         phone = request.form["phone"]
-        user = User(name,username,generate_password_hash(password, 'sha1'), email, phone)
+        user = User(name, username, generate_password_hash(password, 'sha1'), email, phone)
         user.save_to_mongo()
-        return render_template("register.html", registered="{} has been created ".format(request.form["name"]))
+        return render_template("register.html", registered="{} has been created".format(name))
     return render_template("register.html")
 
 
