@@ -44,6 +44,8 @@ def hello():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    # try, except block
+    # if user does not exist
     if request.method == 'POST':
         username = request.form["username"]
         password = request.form["password"]
@@ -55,7 +57,7 @@ def login():
             session['token'] = token
             return render_template("profile.html", user=user['username'], docs=docs)
         else:
-            return jsonify({"message": "login failed"})
+            return render_template("login.html", no_login="Login failed. Check username and apssword")
 
     return render_template("login.html")
 
@@ -80,16 +82,18 @@ def register():
     return render_template("register.html")
 
 
-# @app.route("/auth/login", methods=["POST"])
-# def login():
-#     r = request.json
-#     user = User.find_one_username(r['username'])
-#     user['exp'] = datetime.datetime.utcnow() + datetime.timedelta(minutes=50)
-#     if check_password_hash(user['password'], r['password']):
-#         token = jwt.encode(user, app.config['SECRET_KEY'], )
-#         return jsonify({"token": token.decode('UTF-8')})
-#     else:
-#         return jsonify({"message": "login failed"})
+@app.route("/create_document", methods=['POST', 'GET'])
+def create_document():
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        type = request.form['type']
+        data = jwt.decode(session["token"],key=app.config['SECRET_KEY'])
+        document = Document(title,content,data['username'],data['_id'],type)
+        document.save_to_mongo()
+        return render_template("document.html", saved_document="Document has been created... ish")
+    return render_template("document.html")
+
 
 @app.route("/user", methods=["GET"])
 def get_users():
@@ -109,15 +113,6 @@ def get_one_user_by_id(id):
         return jsonify({"message": "User does not exist"})
 
 
-# @app.route("/user/<username>", methods=["GET"])
-# def get_one_user_by_username(username):
-#     user = User.find_one_username(username)
-#     if user is not None:
-#         return jsonify(user)
-#     else:
-#         return jsonify({"message": "User does not exist"})
-
-
 @app.route("/user", methods=['POST'])
 def post_user():
     r = request.json
@@ -130,9 +125,6 @@ def post_user():
 def update_user(id):
     r = request.json
     user = User.find_one_class_id(id)
-    print(user.username)
-    print(type(r))
-    print(r)
     if user:
         user.update_one(r)
         return jsonify({"message": "{} has been updated".format(user.username)})
@@ -211,7 +203,7 @@ def delete_document(id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=4000)
+    app.run(debug=True, port=4200)
 
 
 
